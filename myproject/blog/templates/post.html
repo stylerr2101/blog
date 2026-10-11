@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+{% block title %}
+{{ post.name }} | Git
+{% endblock %}
+{% block content %}
+<style>
+.article {
+    background: white;
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .08);
+}
+.category {
+    display: inline-block;
+    background: #dbeafe;
+    color: #2563eb;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+.article-title {
+    font-size: 38px;
+    margin: 20px 0 10px;
+}
+.article-meta {
+    color: #6b7280;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+.like {
+    background: #f3f4f6;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+.article-img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+.article-text {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #374151;
+}
+.comment-box {
+    margin-top: 50px;
+}
+.comment {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+.comment-author {
+    color: #2563eb;
+    font-weight: 700;
+}
+.reply {
+    margin-left: 40px;
+    margin-top: 15px;
+}
+.replies {
+    margin-top: 15px;
+}
+.comment-form {
+    margin-top: 40px;
+    background: #f9fafb;
+    padding: 25px;
+    border-radius: 20px;
+}
+textarea {
+    width: 100%;
+    height: 120px;
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid #ddd;
+    resize: none;
+    box-sizing: border-box;
+}
+.comment-btn {
+    margin-top: 15px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 13px 25px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.reply-form {
+    margin-top: 15px;
+}
+.reply-input {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    width: 70%;
+}
+.reply-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+.edit-post-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background .2s, color .2s, transform .2s, box-shadow .2s;
+}
+.edit-post-button:hover {
+    background: #2563eb;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, .25);
+}
+.post-owner-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+.delete-post-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, color .2s, transform .2s, box-shadow .2s;
+}
+.delete-post-button:hover {
+    background: #dc2626;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 38, 38, .25);
+}
+</style>
+<div class="article">
+    <div class="category">
+        {{ post.category.name }}
+    </div>
+    {% if user.is_authenticated and post.user == user %}
+    <div class="post-owner-actions">
+        <a href="{% url 'edit_post' post.id %}" class="edit-post-button">
+             Редактировать
+        </a>
+        <form method="POST" action="{% url 'delete_post' post.id %}" onsubmit="return confirm('Вы действительно хотите удалить этот пост?');">
+            {% csrf_token %}
+            <button type="submit" class="delete-post-button">
+                 Удалить
+            </button>
+        </form>
+    </div>
+    {% endif %}
+    <h1 class="article-title">
+        {{ post.name }}
+    </h1>
+    <div class="article-meta">
+        <span>
+             {{ post.user.username }}
+        </span>
+        <span>
+             {{ post.date|date:"d.m.Y H:i" }}
+        </span>
+        <a class="like" href="{% url 'like_post' post.id %}">
+            {% if liked %}
+                ❤️
+            {% else %}
+                🤍
+            {% endif %}
+            {{ post.likes.count }}
+        </a>
+    </div>
+    {% if post.img %}
+    <img src="{{ post.img.url }}" class="article-img">
+    {% endif %}
+    <div class="article-text">
+        {{ post.description|linebreaks }}
+    </div>
+    <div class="comment-box">
+        <h2>
+             Комментарии (<span id="comments-count">{{ post.comment_set.count }}</span>)
+        </h2>
+        <div id="comments-container">
+            {% for comment in comments %}
+            <div class="comment" data-comment-id="{{ comment.id }}">
+                <div class="comment-author">
+                    👤 {{ comment.user.username }}
+                </div>
+                <p>
+                    {{ comment.text }}
+                </p>
+                <small>
+                     {{ comment.date|date:"d.m.Y H:i" }}
+                </small>
+                {% if user.is_authenticated %}
+                <form class="reply-form" method="POST" action="{% url 'add_comment' post.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="parent" value="{{ comment.id }}">
+                    <input class="reply-input" type="text" name="text" placeholder="Ответить..." required>
+                    <button class="reply-btn" type="submit">
+                        ↩ Ответить
+                    </button>
+                </form>
+                {% endif %}
+                <div class="replies">
+                    {% for reply in comment.comment_set.all %}
+                    <div class="comment reply" data-comment-id="{{ reply.id }}">
+                        <div class="comment-author">
+                            ↳ {{ reply.user.username }}
+                        </div>
+                        <p>
+                            {{ reply.text }}
+                        </p>
+                        <small>
+                            📅 {{ reply.date|date:"d.m.Y H:i" }}
+                        </small>
+                        {% if user.is_authenticated %}
+                        <form class="reply-form" method="POST" action="{% url 'add_comment' post.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="parent" value="{{ reply.id }}">
+                            <input class="reply-input" type="text" name="text" placeholder="Ответить..." required>
+                            <button class="reply-btn" type="submit">
+                                ↩ Ответить
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <p id="no-comments">
+                Комментариев пока нет.
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="comment-form">
+        <h3>
+             Оставить комментарий
+        </h3>
+        <form id="comment-form" method="POST" action="{% url 'add_comment' post.id %}">
+            {% csrf_token %}
+            <textarea name="text" placeholder="Напишите комментарий..." required></textarea>
+            <button class="comment-btn" type="submit">
+                Отправить
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+<script>
+function createReplyForm(commentId) {
+    return `
+        <form class="reply-form" method="POST" action="{% url 'add_comment' post.id %}">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
+            <input type="hidden" name="parent" value="${commentId}">
+            <input class="reply-input" type="text" name="text" placeholder="Ответить..." required>
+            <button class="reply-btn" type="submit">
+                ↩ Ответить
+            </button>
+        </form>
+    `;
+}
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+function createCommentElement(data) {
+    const comment = document.createElement("div");
+    comment.className = "comment";
+    comment.dataset.commentId = data.id;
+    comment.innerHTML = `
+        <div class="comment-author">
+            👤 ${data.username}
+        </div>
+        <p>
+            ${data.text}
+        </p>
+        <small>
+             ${data.date}
+        </small>
+        ${createReplyForm(data.id)}
+        <div class="replies"></div>
+    `;
+    return comment;
+}
+document.addEventListener("submit", async function(event) {
+    if (!event.target.classList.contains("reply-form") && event.target.id !== "comment-form") {
+        return;
+    }
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    });
+    if (!response.ok) {
+        alert("Не удалось добавить комментарий");
+        return;
+    }
+    const data = await response.json();
+    if (data.error) {
+        alert(data.error);
+        return;
+    }
+    const newComment = createCommentElement(data);
+    if (data.parent) {
+        const parentComment = document.querySelector(`[data-comment-id="${data.parent}"]`);
+        if (parentComment) {
+            let replies = parentComment.querySelector(":scope > .replies");
+            if (!replies) {
+                replies = document.createElement("div");
+                replies.className = "replies";
+                parentComment.appendChild(replies);
+            }
+            newComment.classList.add("reply");
+            replies.appendChild(newComment);
+        }
+    } else {
+        document.getElementById("comments-container").appendChild(newComment);
+        const noComments = document.getElementById("no-comments");
+        if (noComments) {
+            noComments.remove();
+        }
+    }
+    form.reset();
+    const count = document.getElementById("comments-count");
+    if (count) {
+        count.textContent = parseInt(count.textContent) + 1;
+    }
+});
+</script>
+{% endblock %}

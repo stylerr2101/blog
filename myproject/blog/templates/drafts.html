@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}
+Черновики | Git
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .drafts-page {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .drafts-header {
+        margin-bottom: 30px;
+    }
+
+    .drafts-header h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .drafts-header p {
+        color: #6b7280;
+    }
+
+    .draft {
+        background: white;
+        border-radius: 22px;
+        padding: 25px;
+        margin-bottom: 20px;
+
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, .07);
+    }
+
+    .draft-status {
+        display: inline-block;
+
+        background: #fef3c7;
+        color: #d97706;
+
+        padding: 7px 14px;
+
+        border-radius: 30px;
+
+        font-size: 13px;
+        font-weight: 700;
+
+        margin-bottom: 15px;
+    }
+
+    .draft h2 {
+        margin: 0 0 10px;
+        font-size: 26px;
+    }
+
+    .draft-meta {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    .draft-description {
+        color: #4b5563;
+        line-height: 1.6;
+    }
+
+    .draft-actions {
+        margin-top: 20px;
+    }
+
+    .edit-button {
+        display: inline-block;
+
+        background: #2563eb;
+        color: white;
+
+        padding: 11px 18px;
+
+        border-radius: 12px;
+
+        font-weight: 600;
+
+        transition: .2s;
+    }
+
+    .edit-button:hover {
+        background: #1d4ed8;
+        color: white;
+    }
+
+    .empty {
+        background: white;
+        border-radius: 22px;
+        padding: 50px;
+        text-align: center;
+
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, .07);
+    }
+
+</style>
+
+<div class="drafts-page">
+    <div class="drafts-header">
+        <h1>
+             Мои черновики
+        </h1>
+        <p>
+            Здесь находятся публикации, которые ещё не опубликованы.
+        </p>
+    </div>
+    {% for post in posts %}
+        <div class="draft">
+            <div class="draft-status">
+                ЧЕРНОВИК
+            </div>
+            <h2>
+                {{ post.name }}
+            </h2>
+            <div class="draft-meta">
+                 {{ post.category.name }}
+                •
+                 {{ post.date|date:"d.m.Y H:i" }}
+            </div>
+            <div class="draft-description">
+                {{ post.description|truncatewords:40 }}
+            </div>
+            <div class="draft-actions">
+                <a
+                    href="{% url 'edit_post' post.id %}"
+                    class="edit-button"
+                >
+                     Редактировать
+                </a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty">
+            <h2>
+                Черновиков пока нет
+            </h2>
+            <p>
+                Создай пост и сохрани его как черновик.
+            </p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

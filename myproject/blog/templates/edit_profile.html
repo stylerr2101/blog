@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Редактирование профиля | Git
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<style>
+    .edit-wrapper {
+
+        display: flex;
+
+        justify-content: center;
+
+    }
+
+
+
+    .edit-card {
+
+        width: 600px;
+
+        background: white;
+
+        padding: 40px;
+
+        border-radius: 25px;
+
+        box-shadow:
+            0 15px 40px rgba(0, 0, 0, .08);
+
+    }
+
+
+
+    .edit-card h1 {
+
+        margin-top: 0;
+
+        font-size: 32px;
+
+    }
+
+
+
+    .avatar-preview {
+
+        width: 120px;
+
+        height: 120px;
+
+        border-radius: 50%;
+
+        object-fit: cover;
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    label {
+
+        display: block;
+
+        font-weight: 700;
+
+        margin-bottom: 8px;
+
+    }
+
+
+
+    input,
+    textarea {
+
+        width: 100%;
+
+        padding: 15px;
+
+        border-radius: 14px;
+
+        border: 1px solid #e5e7eb;
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    textarea {
+
+        height: 150px;
+
+        resize: none;
+
+    }
+
+
+
+    .save-btn {
+
+        width: 100%;
+
+        padding: 15px;
+
+        border: none;
+
+        background: #2563eb;
+
+        color: white;
+
+        border-radius: 14px;
+
+        font-weight: 700;
+
+        font-size: 16px;
+
+        cursor: pointer;
+
+    }
+
+
+
+    .save-btn:hover {
+
+        background: #1d4ed8;
+
+    }
+</style>
+
+
+<div class="edit-wrapper">
+    <div class="edit-card">
+        <h1>
+            ⚙ Редактирование профиля
+        </h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" class="avatar-preview">
+            {% endif %}
+            <label>
+                Аватар
+            </label>
+            <input type="file" name="avatar">
+            <label>
+                Возраст
+            </label>
+            <input type="number" name="age" value="{{ profile.age }}">
+            <label>
+                О себе
+            </label>
+            <textarea name="bio" placeholder="Расскажи о себе...">{{ profile.bio }}</textarea>
+            <button class="save-btn">
+                💾 Сохранить изменения
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

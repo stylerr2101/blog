@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Профиль | Git
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<style>
+    .profile-page {
+
+        max-width: 900px;
+
+        margin: auto;
+
+    }
+
+
+
+    .profile-card {
+
+        background: white;
+
+        border-radius: 25px;
+
+        padding: 40px;
+
+        box-shadow:
+            0 15px 40px rgba(0, 0, 0, .08);
+
+    }
+
+
+
+    /* HEADER */
+
+
+    .profile-header {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 30px;
+
+        margin-bottom: 35px;
+
+    }
+
+
+
+    .avatar {
+
+        width: 120px;
+
+        height: 120px;
+
+        border-radius: 50%;
+
+        object-fit: cover;
+
+        background: #e5e7eb;
+
+    }
+
+
+
+    .avatar-placeholder {
+
+        width: 120px;
+
+        height: 120px;
+
+        border-radius: 50%;
+
+        background: #2563eb;
+
+        color: white;
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        font-size: 45px;
+
+        font-weight: 800;
+
+    }
+
+
+
+    .username {
+
+        font-size: 32px;
+
+        font-weight: 800;
+
+    }
+
+
+
+    .bio {
+
+        color: #6b7280;
+
+        margin-top: 10px;
+
+    }
+
+
+
+    .edit-btn {
+
+        display: inline-block;
+
+        margin-top: 15px;
+
+        background: #2563eb;
+
+        color: white;
+
+        padding: 12px 20px;
+
+        border-radius: 12px;
+
+    }
+
+
+
+    /* POSTS */
+
+
+    .posts-title {
+
+        font-size: 25px;
+
+        margin: 30px 0 20px;
+
+    }
+
+
+
+    .user-post {
+
+        background: #f9fafb;
+
+        padding: 20px;
+
+        border-radius: 18px;
+
+        margin-bottom: 15px;
+
+    }
+
+
+
+    .user-post h3 {
+
+        margin-top: 0;
+
+    }
+
+
+
+    .user-post:hover {
+
+        background: #eff6ff;
+
+    }
+
+
+
+    .empty {
+
+        color: #6b7280;
+
+    }
+
+
+
+
+
+    @media(max-width:600px) {
+
+
+        .profile-header {
+
+            flex-direction: column;
+
+            text-align: center;
+
+        }
+
+
+    }
+</style>
+<div class="profile-page">
+    <div class="profile-card">
+        <div class="profile-header">
+            {% if user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" class="avatar">
+            {% else %}
+            <div class="avatar-placeholder">
+                {{ user.username|first|upper }}
+            </div>
+            {% endif %}
+            <div>
+                <div class="username">
+                    {{ user.username }}
+                </div>
+                <div class="bio">
+                    {% if user.profile.bio %}
+                    {{ user.profile.bio }}
+                    {% else %}
+                    Пользователь Git
+                    {% endif %}
+                </div>
+                <a href="{% url 'edit_profile' %}" class="edit-btn">
+                     Редактировать
+                </a>
+            </div>
+        </div>
+        <h2 class="posts-title">
+             Мои посты
+        </h2>
+        {% for post in posts %}
+        <div class="user-post">
+            <h3>
+                <a href="{% url 'post' post.id %}">
+                    {{ post.name }}
+                </a>
+            </h3>
+            <p>
+                {{ post.description|truncatewords:20 }}
+            </p>
+            <small>
+                 {{ post.date|date:"d.m.Y" }}
+            </small>
+        </div>
+        {% empty %}
+        <p class="empty">
+            Ты еще не создал постов.
+        </p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}
+Редактирование поста | Git
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .edit-page {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    .edit-card {
+        background: white;
+        border-radius: 22px;
+        padding: 35px;
+
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, .08);
+    }
+
+    .edit-card h1 {
+        margin-top: 0;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 13px 15px;
+
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+
+        font-size: 15px;
+
+        outline: none;
+    }
+
+    .form-group textarea {
+
+        min-height: 300px;
+
+        resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+
+        border-color: #2563eb;
+    }
+
+    .current-image {
+
+        margin-bottom: 15px;
+    }
+
+    .current-image img {
+
+        max-width: 250px;
+
+        max-height: 180px;
+
+        object-fit: cover;
+
+        border-radius: 15px;
+    }
+
+    .buttons {
+
+        display: flex;
+
+        gap: 12px;
+
+        margin-top: 30px;
+    }
+
+    .button {
+
+        border: none;
+
+        padding: 13px 20px;
+
+        border-radius: 12px;
+
+        cursor: pointer;
+
+        font-size: 15px;
+
+        font-weight: 600;
+    }
+
+    .save {
+
+        background: #f3f4f6;
+
+        color: #374151;
+    }
+
+    .publish {
+
+        background: #2563eb;
+
+        color: white;
+    }
+
+    .publish:hover {
+
+        background: #1d4ed8;
+    }
+
+    .error {
+
+        background: #fee2e2;
+
+        color: #b91c1c;
+
+        padding: 12px 15px;
+
+        border-radius: 12px;
+
+        margin-bottom: 20px;
+    }
+
+</style>
+
+<div class="edit-page">
+    <div class="edit-card">
+        <h1>
+             Редактирование поста
+        </h1>
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+        {% endif %}
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+            {% csrf_token %}
+            <div class="form-group">
+                <label>
+                    Название
+                </label>
+                <input
+                    type="text"
+                    name="name"
+                    value="{{ post.name }}"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label>
+                    Категория
+                </label>
+                <select
+                    name="category"
+                    required
+                >
+                    {% for category in categories %}
+                        <option
+                            value="{{ category.id }}"
+                            {% if post.category.id == category.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>
+                    Изображение
+                </label>
+                {% if post.img %}
+                    <div class="current-image">
+                        <p>
+                            Текущее изображение:
+                        </p>
+                        <img src="{{ post.img.url }}">
+                    </div>
+                {% endif %}
+                <input type="file" name="img">
+            </div>
+            <div class="form-group">
+                <label>
+                    Текст публикации
+                </label>
+                <textarea
+                    name="description"
+                    required
+                >{{ post.description }}</textarea>
+            </div>
+            <div class="buttons">
+                <button
+                    type="submit"
+                    name="status"
+                    value="draft"
+                    class="button save"
+                >
+                     Сохранить черновик
+                </button>
+                <button
+                    type="submit"
+                    name="status"
+                    value="published"
+                    class="button publish"
+                >
+                     Опубликовать
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

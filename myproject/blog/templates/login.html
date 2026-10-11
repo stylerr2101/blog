@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Вход | Git
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<style>
+    .auth-wrapper {
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+    }
+
+
+
+    .auth-card {
+
+        width: 450px;
+
+        background: white;
+
+        padding: 40px;
+
+        border-radius: 25px;
+
+        box-shadow:
+            0 15px 40px rgba(0, 0, 0, .08);
+
+    }
+
+
+
+    .auth-card h1 {
+
+        text-align: center;
+
+        font-size: 32px;
+
+        margin-bottom: 10px;
+
+    }
+
+
+
+    .auth-subtitle {
+
+        text-align: center;
+
+        color: #6b7280;
+
+        margin-bottom: 30px;
+
+    }
+
+
+
+    .auth-card label {
+
+        font-weight: 700;
+
+        display: block;
+
+        margin-bottom: 8px;
+
+    }
+
+
+
+    .auth-card input {
+
+        width: 100%;
+
+        padding: 15px;
+
+        border-radius: 14px;
+
+        border: 1px solid #e5e7eb;
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    .auth-card input:focus {
+
+        outline: none;
+
+        border-color: #2563eb;
+
+    }
+
+
+
+    .auth-btn {
+
+        width: 100%;
+
+        padding: 15px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        background: #2563eb;
+
+        color: white;
+
+        font-size: 16px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+    }
+
+
+
+    .auth-btn:hover {
+
+        background: #1d4ed8;
+
+    }
+
+
+
+    .auth-link {
+
+        text-align: center;
+
+        margin-top: 20px;
+
+        color: #6b7280;
+
+    }
+
+
+
+    .auth-link a {
+
+        color: #2563eb;
+
+        font-weight: 700;
+
+    }
+
+
+    .error {
+
+        background: #fee2e2;
+
+        color: #991b1b;
+
+        padding: 12px;
+
+        border-radius: 12px;
+
+        margin-bottom: 20px;
+
+    }
+</style>
+
+
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <h1>
+             Вход
+        </h1>
+        <p class="auth-subtitle">
+            С возвращением в Git
+        </p>
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <label>
+                Логин
+            </label>
+            <input type="text" name="username" placeholder="Введите логин">
+            <label>
+                Пароль
+            </label>
+            <input type="password" name="password" placeholder="Введите пароль">
+            <button class="auth-btn">
+                Войти
+            </button>
+        </form>
+        <div class="auth-link">
+            <p>Нет аккаунта?</p>
+            <a href="{% url 'register' %}">
+                Создать
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
